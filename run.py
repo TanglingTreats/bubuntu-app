@@ -11,7 +11,7 @@ messages = []
 def index():
     return render_template("index.html", messages=messages)
     
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["GET", "POST"])
 def get_message():
     username = request.form.get("username")
     msg = request.form.get("message")
