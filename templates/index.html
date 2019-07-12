@@ -11,11 +11,18 @@
     <label for="exampleMsg">Message</label>
     <input type="text" class="form-control" name="message" id="exampleMsg" placeholder="Your Message">
   </div>
-  <button type="submit" value="Send" class="btn btn-primary">Submit</button>
+  <div class="row d-flex justify-content-sm-between">
+    <div class="col-md-4 mb-3">
+      <button type="submit" name="Submit" value="Send" class="btn btn-primary">Submit</button>
+    </div>
+    <div class="col-md-4 mb-3">
+      <button type="submit" name="Clear" value="Clear" class="btn btn-secondary">Clear</button>
+    </div>
+  </div>
 </form>
 </br>
 {%for m in messages %}
-<div>
+<div class="mb-3">
     <strong>From: </strong>{{m["username"]}}<br/>
     <strong>Message: </strong>{{m["message"]}}<br/>
 </div>
