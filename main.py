@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect
 import os
 
 app = Flask(__name__)
+
+app.secret_key = os.getenv("SECRET", "secretkey123")
+
 messages = []
 
 @app.route("/")

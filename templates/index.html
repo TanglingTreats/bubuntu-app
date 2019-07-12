@@ -14,10 +14,3 @@
   <button type="submit" value="Send" class="btn btn-primary">Submit</button>
 </form>
 </br>
-{%for m in messages %}
-<div>
-    <strong>From: </strong>{{m["username"]}}<br/>
-    <strong>Message: </strong>{{m["message"]}}<br/>
-</div>
-{%endfor%}
-{%endblock%}
