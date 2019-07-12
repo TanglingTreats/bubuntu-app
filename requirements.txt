@@ -8,7 +8,7 @@ cryptography==2.1.4
 Django==1.11.10
 enum34==1.1.6
 Flask==1.1.1
-futures==3.2.0
+futures==3.1.1
 idna==2.6
 ikpdb==1.2.3
 Inflector==2.0.12
