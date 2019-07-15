@@ -28,8 +28,7 @@ messages = []
 users = []
 
 isUserIn = False
-
-
+    
 @app.route("/")
 def index():
     messages.clear()
@@ -65,7 +64,7 @@ def index():
     
 @app.route("/", methods=["POST"])
 def get_message():
-    
+    global isUserIn
     if request.form.get("Submit"):
         print("Run")
         username = request.form.get("username")
@@ -76,12 +75,12 @@ def get_message():
             for i in users:
                 if i['username'] == username:
                     print("true")
+                    
                     isUserIn = True
                     break
                 else:
                     print("false")
                     isUserIn = False
-                    
                     
             if(isUserIn):
                 #If user is in record, use user_id to store message with id
@@ -95,7 +94,12 @@ def get_message():
                 query="SELECT MAX(usr_id) FROM users"
                 mycursor.execute(query)
                 res = mycursor.fetchall()
-                new_user_id = res[0][0]+1
+                    
+                if(res[0][0] is None):
+                    new_user_id = 1
+                else:
+                    new_user_id = res[0][0]+1
+                    
                 val = (new_user_id, username)
                 print(val)
                 query = "INSERT INTO users(usr_id, username) VALUES(%s, %s)"
@@ -103,8 +107,7 @@ def get_message():
                 
                 execute_query(new_user_id, msg)
                 
-            
-            
+                
             
     if request.form.get("Clear"):
         messages.clear()
@@ -116,7 +119,10 @@ def execute_query(user_id, msg):
     query="SELECT MAX(msg_id) FROM message"
     mycursor.execute(query)
     res = mycursor.fetchall()
-    msg_id = res[0][0]+1
+    if(res[0][0] is None):
+        msg_id = 1
+    else:
+        msg_id = res[0][0]+1
     val = (msg_id, msg, user_id)
     
     
