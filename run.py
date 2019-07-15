@@ -134,6 +134,6 @@ def execute_query(user_id, msg):
     
 
 if __name__ == "__main__":
-    app.run(host=os.environ.get("IP", "127.0.0.1"),
-            port=int(os.environ.get("PORT", "5000")),
+    app.run(host=os.environ.get("IP"),
+            port=int(os.environ.get("PORT")),
             debug=False)
