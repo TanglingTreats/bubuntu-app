@@ -8,13 +8,18 @@ mydb = mysql.connector.connect(
   database="messages"
 )
 '''
+'''
 mydb = psycopg2.connect(user="postgres",
                         password="postgres",
                         host="localhost",
                         database="messages")
-
+'''
+DATABASE_URL = os.environ['DATABASE_URL']
+mydb = psycopg2.connect(DATABASE_URL, sslmode="require")
 mycursor = mydb.cursor()
 
+print(mydb.get_dsn_parameters(),"\n")
+ 
 app = Flask(__name__)
 
 app.secret_key = os.getenv("SECRET", "secretkey123")
