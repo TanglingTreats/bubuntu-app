@@ -1,12 +1,17 @@
 from flask import Flask, render_template, request, redirect
-import os, mysql.connector
-
+import os, psycopg2
+'''
 mydb = mysql.connector.connect(
   host="localhost",
   user="ubuntu",
   passwd="mysql",
   database="messages"
 )
+'''
+mydb = psycopg2.connect(user="postgres",
+                        password="postgres",
+                        host="localhost",
+                        database="messages")
 
 mycursor = mydb.cursor()
 
@@ -20,12 +25,15 @@ users = []
 isUserIn = False
 
 
-
 @app.route("/")
 def index():
     messages.clear()
     users.clear()
-    sql = "SELECT user.username AS user, message.msg_content AS content FROM user INNER JOIN message ON message.usr_id = user.usr_id"
+    sql = """SELECT users.username AS user, 
+    message.msg_content AS content 
+    FROM users 
+    INNER JOIN message ON message.usr_id = users.usr_id"""
+    
     mycursor.execute(sql)
 
     res = mycursor.fetchall()
@@ -36,13 +44,14 @@ def index():
         }
         messages.append(post)
         
-    sql = "SELECT DISTINCT (usr_id) FROM user"
+    sql = "SELECT DISTINCT usr_id, username FROM users"
     mycursor.execute(sql)
     
     res = mycursor.fetchall()
     for x in res:
         user = {
-            "user_id": x[0]
+            "user_id": x[0],
+            "username": x[1]
         }
         users.append(user)
     
@@ -61,29 +70,30 @@ def get_message():
             print("If ran")
             for i in users:
                 if i['username'] == username:
+                    print("true")
                     isUserIn = True
                     break
                 else:
+                    print("false")
                     isUserIn = False
                     
                     
             if(isUserIn):
                 #If user is in record, use user_id to store message with id
                 user_id = i['user_id']
-                
                 execute_query(user_id, msg)
                 
             else:
                 #else create a new record for user and store user_id in both tables
                 #query for highest user_id, then add 1 to store as new user_id
                 print("This ain't the user id")
-                query="SELECT MAX(usr_id) FROM user"
+                query="SELECT MAX(usr_id) FROM users"
                 mycursor.execute(query)
                 res = mycursor.fetchall()
                 new_user_id = res[0][0]+1
                 val = (new_user_id, username)
                 print(val)
-                query = "INSERT INTO user(usr_id, username) VALUES(%s, %s)"
+                query = "INSERT INTO users(usr_id, username) VALUES(%s, %s)"
                 mycursor.execute(query, val)
                 
                 execute_query(new_user_id, msg)
@@ -105,13 +115,14 @@ def execute_query(user_id, msg):
     val = (msg_id, msg, user_id)
     
     
-    query = "INSERT INTO message(msg_id, msg_content, usr_id) VALUES(%s, %s, %s)"
+    query = """INSERT INTO message(msg_id, msg_content, usr_id) 
+                VALUES(%s, %s, %s)"""
     mycursor.execute(query, val)
     mydb.commit()
     
     
 
 if __name__ == "__main__":
-    app.run(host=os.environ.get("IP", "0.0.0.0"),
+    app.run(host=os.environ.get("IP", "127.0.0.1"),
             port=int(os.environ.get("PORT", "5000")),
             debug=True)
