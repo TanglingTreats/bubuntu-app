@@ -1,24 +1,12 @@
 from flask import Flask, render_template, request, redirect
 import os, psycopg2
-'''
-mydb = mysql.connector.connect(
-  host="localhost",
-  user="ubuntu",
-  passwd="mysql",
-  database="messages"
-)
-'''
-'''
-mydb = psycopg2.connect(user="postgres",
-                        password="postgres",
-                        host="localhost",
-                        database="messages")
-'''
-DATABASE_URL = os.environ['DATABASE_URL']
-mydb = psycopg2.connect(DATABASE_URL, sslmode="require")
-mycursor = mydb.cursor()
 
-#print(mydb.get_dsn_parameters(),"\n")
+DATABASE_URL = os.environ['DATABASE_URL']
+
+#print(conn.get_dsn_parameters(),"\n")
+
+conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+mycursor = conn.cursor()
  
 app = Flask(__name__)
 
@@ -33,6 +21,7 @@ isUserIn = False
 def index():
     messages.clear()
     users.clear()
+    
     sql = """SELECT users.username AS user, 
     message.msg_content AS content 
     FROM users 
@@ -58,28 +47,22 @@ def index():
             "username": x[1]
         }
         users.append(user)
-    
-    print(users)
     return render_template("index.html", messages=messages)
     
 @app.route("/", methods=["POST"])
 def get_message():
     global isUserIn
+    
     if request.form.get("Submit"):
-        print("Run")
         username = request.form.get("username")
         msg = request.form.get("message")
         
         if username != '' and msg != '':
-            print("If ran")
             for i in users:
                 if i['username'] == username:
-                    print("true")
-                    
                     isUserIn = True
                     break
                 else:
-                    print("false")
                     isUserIn = False
                     
             if(isUserIn):
@@ -90,7 +73,6 @@ def get_message():
             else:
                 #else create a new record for user and store user_id in both tables
                 #query for highest user_id, then add 1 to store as new user_id
-                print("This ain't the user id")
                 query="SELECT MAX(usr_id) FROM users"
                 mycursor.execute(query)
                 res = mycursor.fetchall()
@@ -101,7 +83,6 @@ def get_message():
                     new_user_id = res[0][0]+1
                     
                 val = (new_user_id, username)
-                print(val)
                 query = "INSERT INTO users(usr_id, username) VALUES(%s, %s)"
                 mycursor.execute(query, val)
                 
@@ -129,10 +110,9 @@ def execute_query(user_id, msg):
     query = """INSERT INTO message(msg_id, msg_content, usr_id) 
                 VALUES(%s, %s, %s)"""
     mycursor.execute(query, val)
-    mydb.commit()
+    conn.commit()
     
     
-
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP", "0.0.0.0"),
             port=int(os.environ.get("PORT", "5000")),
