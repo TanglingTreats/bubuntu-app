@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css?family=Merriweather|Montserrat:400,500&display=swap');
+
+body {
+    font-family: "Merriweather";
+    color: #9c5a5a;
+    background: #fff0f0;
+}
+
+#mainNavbar{
+    font-family: "Montserrat";
+    background: #ffd6d6;
+}
+
+#mainNavbar {
+    color: #9c2426;
+}
+
+#mainNavbar .nav-link:hover {
+    color: #570d0e;
+}
+
+.active {
+    color: #ffe3e3;
+}
+
+button {
+    font-family: "Montserrat";
+}

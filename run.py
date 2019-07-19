@@ -16,9 +16,13 @@ messages = []
 users = []
 
 isUserIn = False
-    
+
 @app.route("/")
 def index():
+    return render_template("index.html")
+    
+@app.route("/messages")
+def message():
     messages.clear()
     users.clear()
     
@@ -47,54 +51,47 @@ def index():
             "username": x[1]
         }
         users.append(user)
-    return render_template("index.html", messages=messages)
+    return render_template("chat.html", messages=messages)
     
-@app.route("/", methods=["POST"])
+@app.route("/messages", methods=["POST"])
 def get_message():
     global isUserIn
     
-    if request.form.get("Submit"):
-        username = request.form.get("username")
-        msg = request.form.get("message")
-        
-        if username != '' and msg != '':
-            for i in users:
-                if i['username'] == username:
-                    isUserIn = True
-                    break
-                else:
-                    isUserIn = False
-                    
-            if(isUserIn):
-                #If user is in record, use user_id to store message with id
-                user_id = i['user_id']
-                execute_query(user_id, msg)
-                
+    username = request.form.get("username")
+    msg = request.form.get("message")
+    
+    if username != '' and msg != '':
+        for i in users:
+            if i['username'] == username:
+                isUserIn = True
+                break
             else:
-                #else create a new record for user and store user_id in both tables
-                #query for highest user_id, then add 1 to store as new user_id
-                query="SELECT MAX(usr_id) FROM users"
-                mycursor.execute(query)
-                res = mycursor.fetchall()
-                    
-                if(res[0][0] is None):
-                    new_user_id = 1
-                else:
-                    new_user_id = res[0][0]+1
-                    
-                val = (new_user_id, username)
-                query = "INSERT INTO users(usr_id, username) VALUES(%s, %s)"
-                mycursor.execute(query, val)
+                isUserIn = False
                 
-                execute_query(new_user_id, msg)
-                
-                
+        if(isUserIn):
+            #If user is in record, use user_id to store message with id
+            user_id = i['user_id']
+            execute_query(user_id, msg)
             
-    if request.form.get("Clear"):
-        messages.clear()
-        print(messages)
+        else:
+            #else create a new record for user and store user_id in both tables
+            #query for highest user_id, then add 1 to store as new user_id
+            query="SELECT MAX(usr_id) FROM users"
+            mycursor.execute(query)
+            res = mycursor.fetchall()
+                
+            if(res[0][0] is None):
+                new_user_id = 1
+            else:
+                new_user_id = res[0][0]+1
+                
+            val = (new_user_id, username)
+            query = "INSERT INTO users(usr_id, username) VALUES(%s, %s)"
+            mycursor.execute(query, val)
+            
+            execute_query(new_user_id, msg)
         
-    return redirect("/")
+    return redirect("/messages")
     
 def execute_query(user_id, msg):
     query="SELECT MAX(msg_id) FROM message"

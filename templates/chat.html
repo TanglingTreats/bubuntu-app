@@ -1,0 +1,31 @@
+{%extends 'layout.html'%}
+{%block title%}Hello~{%endblock%}
+{%block heading%}Bubuntu Chat{%endblock%}
+{%block content%}
+<form class="form" method="POST">
+  <div class="form-group">
+    <label for="exampleUser">Username</label>
+    <input type="text" class="form-control" name="username" id="exampleUser" aria-describedby="userName" placeholder="Enter Username" autocomplete="off">
+  </div>
+  <div class="form-group">
+    <label for="exampleMsg">Message</label>
+    <input type="text" class="form-control" name="message" id="exampleMsg" placeholder="Your Message" autocomplete="off">
+  </div>
+  <div class="row d-flex justify-content-sm-between">
+    <div class="col-md-4 mb-3">
+      <button type="submit" name="Submit" value="Send" class="btn btn-primary">Submit</button>
+    </div>
+    <div class="col-md-4 mb-3">
+      <button type="submit" name="Clear" value="Clear" class="btn btn-secondary">Clear</button>
+    </div>
+  </div>
+</form>
+</br>
+{%for m in messages %}
+<div class="mb-3">
+    <strong>From: </strong>{{m["username"]}}<br/>
+    <strong>Message: </strong>{{m["message"]}}<br/>
+    <hr>
+</div>
+{%endfor%}
+{%endblock%}
