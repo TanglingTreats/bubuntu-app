@@ -108,9 +108,9 @@ def execute_query(user_id, msg):
                 VALUES(%s, %s, %s)"""
     mycursor.execute(query, val)
     conn.commit()
-    
+
     
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP", "0.0.0.0"),
             port=int(os.environ.get("PORT", "5000")),
-            debug=False)
+            debug=True)

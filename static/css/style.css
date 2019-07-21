@@ -11,16 +11,16 @@ body {
     background: #ffd6d6;
 }
 
-#mainNavbar {
-    color: #9c2426;
+#mainNavbar .nav-link {
+    color: #fffafa;
 }
 
 #mainNavbar .nav-link:hover {
     color: #570d0e;
 }
 
-.active {
-    color: #ffe3e3;
+#mainNavbar .active>.nav-link {
+    color: #9c2426;
 }
 
 button {
