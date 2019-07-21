@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect
 import os, psycopg2
 
+from pgdb import PGDB
+
 DATABASE_URL = os.environ['DATABASE_URL']
 
 #print(conn.get_dsn_parameters(),"\n")
@@ -25,15 +27,14 @@ def index():
 def message():
     messages.clear()
     users.clear()
+    db = PGDB()
     
     sql = """SELECT users.username AS user, 
     message.msg_content AS content 
     FROM users 
     INNER JOIN message ON message.usr_id = users.usr_id"""
     
-    mycursor.execute(sql)
-
-    res = mycursor.fetchall()
+    res = db.get_data(sql)
     for x in res:
         post = {
             "username": x[0],
@@ -42,20 +43,22 @@ def message():
         messages.append(post)
         
     sql = "SELECT DISTINCT usr_id, username FROM users"
-    mycursor.execute(sql)
     
-    res = mycursor.fetchall()
+    res = db.get_data(sql)
     for x in res:
+        print(x)
         user = {
             "user_id": x[0],
             "username": x[1]
         }
         users.append(user)
+    
     return render_template("chat.html", messages=messages)
     
 @app.route("/messages", methods=["POST"])
 def get_message():
     global isUserIn
+    db = PGDB()
     
     username = request.form.get("username")
     msg = request.form.get("message")
@@ -71,7 +74,8 @@ def get_message():
         if(isUserIn):
             #If user is in record, use user_id to store message with id
             user_id = i['user_id']
-            execute_query(user_id, msg)
+            db.create_msg(user_id, msg)
+            #execute_query(user_id, msg)
             
         else:
             #else create a new record for user and store user_id in both tables
@@ -87,30 +91,14 @@ def get_message():
                 
             val = (new_user_id, username)
             query = "INSERT INTO users(usr_id, username) VALUES(%s, %s)"
-            mycursor.execute(query, val)
+            db.create_user(query, val)
             
-            execute_query(new_user_id, msg)
+            db.create_msg(new_user_id, msg)
         
     return redirect("/messages")
-    
-def execute_query(user_id, msg):
-    query="SELECT MAX(msg_id) FROM message"
-    mycursor.execute(query)
-    res = mycursor.fetchall()
-    if(res[0][0] is None):
-        msg_id = 1
-    else:
-        msg_id = res[0][0]+1
-    val = (msg_id, msg, user_id)
-    
-    
-    query = """INSERT INTO message(msg_id, msg_content, usr_id) 
-                VALUES(%s, %s, %s)"""
-    mycursor.execute(query, val)
-    conn.commit()
 
     
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP", "0.0.0.0"),
             port=int(os.environ.get("PORT", "5000")),
-            debug=True)
+            debug=False)
