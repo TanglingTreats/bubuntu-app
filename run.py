@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 import os, psycopg2
 
 from pgdb import PGDB
@@ -29,8 +29,9 @@ def message():
     users.clear()
     db = PGDB()
     
-    sql = """SELECT users.username AS user, 
-    message.msg_content AS content 
+    sql = """SELECT users.username, 
+    message.msg_content, 
+    message.msg_id 
     FROM users 
     INNER JOIN message ON message.usr_id = users.usr_id"""
     
@@ -38,7 +39,8 @@ def message():
     for x in res:
         post = {
             "username": x[0],
-            "message":x[1]
+            "message": x[1],
+            "msg_id": x[2]
         }
         messages.append(post)
         
@@ -46,7 +48,6 @@ def message():
     
     res = db.get_data(sql)
     for x in res:
-        print(x)
         user = {
             "user_id": x[0],
             "username": x[1]
@@ -91,11 +92,25 @@ def get_message():
                 
             val = (new_user_id, username)
             query = "INSERT INTO users(usr_id, username) VALUES(%s, %s)"
-            db.create_user(query, val)
+            db.execute_query_val(query, val)
             
             db.create_msg(new_user_id, msg)
         
     return redirect("/messages")
+    
+@app.route("/messages/delete/<username>-<msg_id>")
+def confirm_delete_msg(username, msg_id):
+    return render_template("confirm-delete-message.html", username=username)
+    
+@app.route("/messages/delete/<username>-<msg_id>", methods=["POST"])
+def delete_msg(username, msg_id):
+    print(username)
+    db = PGDB()
+    query = "DELETE FROM message WHERE msg_id = %s"
+    val = [msg_id]
+    db.execute_query_val(query, val)
+    
+    return redirect(url_for("message"))
 
     
 if __name__ == "__main__":

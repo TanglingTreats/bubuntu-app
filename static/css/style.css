@@ -16,11 +16,11 @@ body {
 }
 
 #mainNavbar .nav-link:hover {
-    color: #570d0e;
+    color: #9c2426;
 }
 
 #mainNavbar .active>.nav-link {
-    color: #9c2426;
+    color: #570d0e;
 }
 
 button {

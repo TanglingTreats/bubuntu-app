@@ -15,17 +15,23 @@
     <div class="col-md-4 mb-3">
       <button type="submit" name="Submit" value="Send" class="btn btn-primary">Submit</button>
     </div>
-    <div class="col-md-4 mb-3">
-      <button type="submit" name="Clear" value="Clear" class="btn btn-secondary">Clear</button>
-    </div>
   </div>
 </form>
 </br>
 {%for m in messages %}
-<div class="mb-3">
+<div class="row d-flex justify-content-center">
+  <div class="col-sm-4">
     <strong>From: </strong>{{m["username"]}}<br/>
     <strong>Message: </strong>{{m["message"]}}<br/>
+  </div>
+  <div class="col-sm-3">
+    <a class="btn btn-secondary ml-auto" href="{{ url_for('confirm_delete_msg', username=m['username'], msg_id=m['msg_id'] ) }}">Delete This Message</a>
+  </div>
+</div>
+<div class="row d-flex justify-content-around mb-3">
+  <div class="col-sm-8 ">
     <hr>
+  </div>
 </div>
 {%endfor%}
 {%endblock%}

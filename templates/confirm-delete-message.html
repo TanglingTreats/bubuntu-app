@@ -1,0 +1,12 @@
+{%extends 'layout.html'%}
+{%block title%}Delete message?{%endblock%}
+{%block heading%}{%endblock%}
+{%block content%}
+<div class="text-center">
+    <p>Are you sure? You're about to delete a message from {{username}}</p>
+    <form class="form" method="POST">
+        <input class="btn btn-danger" type="submit" value="Yes I'm sure"/>
+        <a href="{{ url_for('message') }}" class="btn btn-secondary">I guess not</a>
+    </form>
+</div>
+{%endblock%}

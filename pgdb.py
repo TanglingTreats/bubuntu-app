@@ -11,7 +11,7 @@ class PGDB:
         self.mycursor.execute(query)
         return self.mycursor.fetchall()
         
-    def create_user(self, query, val):
+    def execute_query_val(self, query, val):
         self.mycursor.execute(query, val)
         self.conn.commit()
         
